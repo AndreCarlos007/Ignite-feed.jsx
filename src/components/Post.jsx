@@ -4,24 +4,49 @@ import { ptBR } from 'date-fns/locale'
 import styles from './Post.module.css'
 import Comment from './Comment'
 import Avatar from './Avatar'
+import { useState } from 'react'
 
 
-const comments = [
-  1,
-  2,
-  
-];
 
 const Post = ({author, publishedAt, content}) => {
-console.log('data recebida', publishedAt)
 const publishedDateFormatted = format(publishedAt, "d 'de' LLLL 'as' HH:mm'h'", {
   locale: ptBR
 });
+
+const [comments, setComments] = useState([
+  'Post muito bacana ein!',
+])
+
+function deleteComment(commentToDelete) {
+  const commentWithoutDeleteOne = comments.filter(comment => {
+    return comment !== commentToDelete
+  })
+    setComments(commentWithoutDeleteOne)
+}
+
+const [newCommentText, setNewCommenText] = useState('')
+
+function handleNewCommentChange() {
+  event.target.setCustomValidity('');
+    setNewCommenText(event.target.value)
+    
+}
 
 const publishedDateRelativeToNow = formatDistanceToNow(publishedAt, {
   locale: ptBR,
   addSuffix: true,
 })
+
+function handleCreateNewComment() {
+  event.preventDefault()
+  
+  setComments([...comments, newCommentText]);
+  setNewCommenText('')
+}
+
+function handleNewCommentInvalid() {
+  event.target.setCustomValidity('Esse campo é obrigatório!');
+}
 
   return (
       <article className={styles.post}>
@@ -43,18 +68,25 @@ const publishedDateRelativeToNow = formatDistanceToNow(publishedAt, {
            {
             content.map(line => {
               if(line.type == 'paragraph') {
-                return <p>{line.content}</p>
+                return <p key={line.content}>{line.content}</p>
               }else if(line.type == 'link'){
-                return <p><a href="#">{line.content}</a></p>
+                return <p key={line.content}><a href="#">{line.content}</a></p>
               }
 
             })
            }
           </div>
 
-          <form className={styles.commentForm}>
-            <textarea 
+          <form onSubmit={handleCreateNewComment} className={styles.commentForm}>
+            <strong>Deixe seu feedback</strong>
+
+            <textarea
+            value={newCommentText} 
+            onChange={handleNewCommentChange}
+            name='comment'
             placeholder='Deixe um comentário'
+            onInvalid={handleNewCommentInvalid}
+            required
             />
             
             <footer>
@@ -65,7 +97,13 @@ const publishedDateRelativeToNow = formatDistanceToNow(publishedAt, {
 
           <div className={styles.commentList}>
             {comments.map(comment =>{
-              return <Comment />
+              return (
+              <Comment 
+                key={comment} 
+                onDeleteComment={deleteComment} 
+                content={comment}
+                />
+              )
             })}
           </div>
             
