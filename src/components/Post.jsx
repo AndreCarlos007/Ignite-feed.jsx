@@ -48,6 +48,7 @@ function handleNewCommentInvalid() {
   event.target.setCustomValidity('Esse campo é obrigatório!');
 }
 
+const isNewCommentEmpty = newCommentText.length == 0;
   return (
       <article className={styles.post}>
           <header>
@@ -90,7 +91,11 @@ function handleNewCommentInvalid() {
             />
             
             <footer>
-              <button type='submit'>Publicar</button>
+              <button 
+              disabled={isNewCommentEmpty}
+              type='submit'>
+                Publicar
+              </button>
             </footer>
           
           </form>
